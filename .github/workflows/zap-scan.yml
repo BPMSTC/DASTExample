@@ -3,7 +3,6 @@ name: DAST-Scan
 on:
   push:
     branches: [ "main" ]
-  pull_request:
 
 jobs:
   zap-scan:
@@ -18,17 +17,15 @@ jobs:
       - name: Run container in background
         run: docker run -d -p 127.0.0.1:5000:5000 --name vuln_container python-vuln-app
 
-      - name: Wait for container to be ready
+      - name: Wait for container
         run: sleep 10
 
       - name: OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.4.0   # ← Use a more recent version
+        uses: zaproxy/action-full-scan@v0.4.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}   # Required if you want issue comments, etc.
-          target: "http://localhost:5000"
-          docker_name: "owasp/zap2docker-weekly"  # ← Specify a currently available image
-          rules_file_name: ".zap/rules.tsv"
+          target: 'http://localhost:5000'
+          docker_name: 'zaproxy/zap2docker-weekly'
 
-      - name: Stop and remove container
+      - name: Stop container
         if: always()
         run: docker stop vuln_container && docker rm vuln_container
