@@ -7,7 +7,6 @@ permissions:
   pull-requests: write
   id-token: write
   actions: write
-  
 
 on:
   push:
@@ -38,8 +37,17 @@ jobs:
           target: 'http://localhost:5000'
           docker_name: "zaproxy/zap-stable"
 
-
       - name: Stop container
         if: always()
         run: docker stop vuln_container && docker rm vuln_container
 
+      - name: Upload ZAP Scan Report
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: zap-scan-report
+          path: |
+            report.html
+            report.md
+            report.xml
+            zap.yaml
