@@ -1,6 +1,11 @@
 name: DAST-Scan
 permissions:
   issues: write
+  contents: write
+  packages: write
+  security-events: write
+  pull-requests: write
+  id-token: write
 
 on:
   push:
