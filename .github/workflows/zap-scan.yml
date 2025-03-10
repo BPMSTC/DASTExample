@@ -1,4 +1,6 @@
 name: DAST-Scan
+permissions:
+  issues: write
 
 on:
   push:
