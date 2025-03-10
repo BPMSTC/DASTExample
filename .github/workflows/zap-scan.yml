@@ -1,0 +1,33 @@
+name: DAST-Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  zap-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t python-vuln-app .
+
+      - name: Run container in background
+        run: docker run -d -p 127.0.0.1:5000:5000 --name vuln_container python-vuln-app
+
+      - name: Wait for container to be ready
+        run: sleep 10  # Give a few seconds for Flask to start
+
+      - name: OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.2.0
+        with:
+          target: "http://localhost:5000"
+          rules_file_name: ".zap/rules.tsv"  # Optional if you want to customize rules
+          # Additional parameters can be set here
+
+      - name: Stop and remove container
+        if: always()
+        run: docker stop vuln_container && docker rm vuln_container 
