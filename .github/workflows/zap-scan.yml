@@ -19,15 +19,16 @@ jobs:
         run: docker run -d -p 127.0.0.1:5000:5000 --name vuln_container python-vuln-app
 
       - name: Wait for container to be ready
-        run: sleep 10  # Give a few seconds for Flask to start
+        run: sleep 10
 
       - name: OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.2.0
+        uses: zaproxy/action-full-scan@v0.4.0   # ← Use a more recent version
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}   # Required if you want issue comments, etc.
           target: "http://localhost:5000"
-          rules_file_name: ".zap/rules.tsv"  # Optional if you want to customize rules
-          # Additional parameters can be set here
+          docker_name: "owasp/zap2docker-weekly"  # ← Specify a currently available image
+          rules_file_name: ".zap/rules.tsv"
 
       - name: Stop and remove container
         if: always()
-        run: docker stop vuln_container && docker rm vuln_container 
+        run: docker stop vuln_container && docker rm vuln_container
